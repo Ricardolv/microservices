@@ -1,5 +1,7 @@
 package com.richard.stockservice.resource;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -13,6 +15,7 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,15 +27,20 @@ public class StockResource {
     RestTemplate restTemplate;
 
     @GetMapping("/{username}")
-    public List<Stock> getStock(@PathVariable("username") final String userName) {
+    public List<Quote> getStock(@PathVariable("username") final String userName) {
 
-        ResponseEntity<List<String>> quoteResponse = restTemplate.exchange("http://localhost:8300/db/" + userName, HttpMethod.GET,
-                null, new ParameterizedTypeReference<List<String>>() {});
+        ResponseEntity<List<String>> quoteResponse = restTemplate.exchange("http://db-service/db/" + userName, HttpMethod.GET,
+                null, new ParameterizedTypeReference<List<String>>() {
+                });
+
 
         List<String> quotes = quoteResponse.getBody();
         return quotes
                 .stream()
-                .map(this::getStockPrice)
+                .map(quote -> {
+                    Stock stock = getStockPrice(quote);
+                    return new Quote(quote, null != stock.getQuote() ? stock.getQuote().getPrice() : null);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -45,4 +53,10 @@ public class StockResource {
         }
     }
 
+    @Data
+    @AllArgsConstructor
+    private class Quote {
+        private String quote;
+        private BigDecimal price;
+    }
 }

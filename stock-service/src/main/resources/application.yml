@@ -13,4 +13,4 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8302/eureka/
   instance:
-    hostname: localhost:8301
+    hostname: localhost
