@@ -10,4 +10,4 @@ follows microservices:
 ![Architecture](Architecture.png)
 
 
-[study reference] (https://techprimers.github.io/)
+[study reference](https://techprimers.github.io/)
